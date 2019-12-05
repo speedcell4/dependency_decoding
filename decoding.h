@@ -26,5 +26,4 @@ void c_chu_liu_edmonds(
         std::vector<bool> *disabled,
         std::vector<std::vector<int> > *candidate_heads,
         std::vector<std::vector<double> > *candidate_scores,
-        std::vector<int> *heads,
-        double *value);
+        std::vector<int> *heads);

@@ -31,8 +31,7 @@ void c_chu_liu_edmonds(
         vector<bool> *disabled,
         vector<vector<int> > *candidate_heads,
         vector<vector<double> > *candidate_scores,
-        vector<int> *heads,
-        double *value) {
+        vector<int> *heads) {
     // Original number of nodes (including the root).
     size_t length = disabled->size();
 
@@ -89,10 +88,6 @@ void c_chu_liu_edmonds(
 
     // If there are no cycles, then this is a well formed tree.
     if (cycle.empty()) {
-        *value = 0.0;
-        for (int m = 1; m < length; ++m) {
-            *value += best_scores[m];
-        }
         return;
     }
 
@@ -187,8 +182,7 @@ void c_chu_liu_edmonds(
     c_chu_liu_edmonds(disabled,
                     candidate_heads,
                     candidate_scores,
-                    heads,
-                    value);
+                    heads);
 
     // Uncontract the cycle.
     int h = (*heads)[representative];
