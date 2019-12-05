@@ -16,14 +16,18 @@
 // You should have received a copy of the GNU Lesser General Public License
 // along with TurboParser 2.3.  If not, see <http://www.gnu.org/licenses/>.
 
-
 #include <iostream>
 #include <vector>
 
 // Decoder for the basic model; it finds a maximum weighted arborescence
 // using Edmonds' algorithm (which runs in O(n^2)).
-void c_chu_liu_edmonds(
-        std::vector<bool> *disabled,
-        std::vector<std::vector<int> > *candidate_heads,
-        std::vector<std::vector<double> > *candidate_scores,
-        std::vector<int> *heads);
+void c_chu_liu_edmonds(std::vector<bool> *disabled,
+                       std::vector<std::vector<int> > *candidate_heads,
+                       std::vector<std::vector<double> > *candidate_scores,
+                       std::vector<int> *heads);
+
+void batch_c_chu_liu_edmonds(
+    std::vector<std::vector<bool> > *disabled,
+    std::vector<std::vector<std::vector<int> > > *candidate_heads,
+    std::vector<std::vector<std::vector<double> > > *candidate_scores,
+    std::vector<std::vector<int> > *heads);

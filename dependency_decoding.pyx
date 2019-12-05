@@ -13,38 +13,60 @@ cdef extern from "decoding.h":
             vector[vector[double]] *candidate_scores,
             vector[int] *heads);
 
+    cdef void batch_c_chu_liu_edmonds(
+            vector[vector[cbool]] *disabled,
+            vector[vector[vector[int]]] *candidate_heads,
+            vector[vector[vector[double]]] *candidate_scores,
+            vector[vector[int]] *heads);
 
-def chu_liu_edmonds(double[:,:] score_arc, double [:] score_root):
+
+def chu_liu_edmonds(double[:,:,:] score_arc, double [:,:] score_root, int [:] lengths):
     # The size of the sentence includes the root at index 0
-    cdef size_t sentence_len = len(score_arc)+1
-    cdef vector[vector[int]] candidate_heads
-    cdef vector[vector[double]] candidate_scores
-    cdef vector[int] heads = vector[int](sentence_len, -1)
-    cdef vector[cbool] disabled = vector[cbool](sentence_len, <cbool> False)
-
-    candidate_scores.resize(sentence_len)
-    candidate_heads.resize(sentence_len)
-
-    assert score_arc.shape[0] == score_arc.shape[1], "Score matrix must be square"
+    # cdef size_t sentence_len = len(score_arc)+1
+    cdef vector[vector[vector[int]]] candidate_heads
+    cdef vector[vector[vector[double]]] candidate_scores
+    cdef vector[vector[int]] heads
+    cdef vector[vector[cbool]] disabled
+    # cdef vector[int] heads = vector[int](sentence_len, -1)
+    # cdef vector[cbool] disabled = vector[cbool](sentence_len, <cbool> False)
 
     cdef int dep_i, head_i
     cdef double edge_score
-    for dep_i in range(score_arc.shape[0]):
 
-        edge_score = score_root[dep_i]
-        if not isnan(edge_score):
-            candidate_heads[dep_i+1].push_back(0)
-            candidate_scores[dep_i+1].push_back(edge_score)
+    batch_size = len(lengths)
+    candidate_heads.resize(batch_size)
+    candidate_scores.resize(batch_size)
+    heads.resize(batch_size)
+    disabled.resize(batch_size)
 
-        for head_i in range(score_arc.shape[1]):
-            edge_score = score_arc[dep_i, head_i]
+    assert score_arc.shape[1] == score_arc.shape[2], "Score matrix must be square"
+
+    for i, l in enumerate(lengths):
+        sentence_len = l + 1
+        candidate_scores[i].resize(sentence_len)
+        candidate_heads[i].resize(sentence_len)
+        heads[i].resize(sentence_len, -1)
+        disabled[i].resize(sentence_len, <cbool> False)
+
+        for dep_i in range(l):
+
+            edge_score = score_root[i][dep_i]
             if not isnan(edge_score):
-                candidate_heads[dep_i+1].push_back(head_i+1)
-                candidate_scores[dep_i+1].push_back(edge_score)
+                candidate_heads[i][dep_i+1].push_back(0)
+                candidate_scores[i][dep_i+1].push_back(edge_score)
 
+            for head_i in range(l):
+                edge_score = score_arc[i][dep_i, head_i]
+                if not isnan(edge_score):
+                    candidate_heads[i][dep_i+1].push_back(head_i+1)
+                    candidate_scores[i][dep_i+1].push_back(edge_score)
 
-    c_chu_liu_edmonds(disabled=&disabled, candidate_heads=&candidate_heads, candidate_scores=&candidate_scores,
-                    heads=&heads)
+    batch_c_chu_liu_edmonds(
+        disabled=&disabled,
+        candidate_heads=&candidate_heads,
+        candidate_scores=&candidate_scores,
+        heads=&heads,
+    )
 
     # Convert heads format
     return heads
