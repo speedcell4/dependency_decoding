@@ -49,17 +49,16 @@ def chu_liu_edmonds(double[:,:,:] score_arc, double [:,:] score_root, int [:] le
         disabled[i].resize(sentence_len, <cbool> False)
 
         for dep_i in range(l):
-
-            edge_score = score_root[i][dep_i]
-            if not isnan(edge_score):
-                candidate_heads[i][dep_i+1].push_back(0)
-                candidate_scores[i][dep_i+1].push_back(edge_score)
-
             for head_i in range(l):
                 edge_score = score_arc[i][dep_i, head_i]
                 if not isnan(edge_score):
                     candidate_heads[i][dep_i+1].push_back(head_i+1)
                     candidate_scores[i][dep_i+1].push_back(edge_score)
+
+            edge_score = score_root[i][dep_i]
+            if not isnan(edge_score):
+                candidate_heads[i][dep_i+1].push_back(0)
+                candidate_scores[i][dep_i+1].push_back(edge_score)
 
     batch_c_chu_liu_edmonds(
         disabled=&disabled,

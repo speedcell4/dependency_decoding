@@ -196,13 +196,25 @@ void c_chu_liu_edmonds(vector<bool> *disabled,
   }
 }
 
+int number_of_root(std::vector<int> &heads) {
+  int ans = 0;
+  for (int i = 0; heads.size() > i; i += 1) {
+    if (heads[i] == 0) ans += 1;
+  }
+  return ans;
+}
+
 void batch_c_chu_liu_edmonds(
     std::vector<std::vector<bool> > *disabled,
     std::vector<std::vector<std::vector<int> > > *candidate_heads,
     std::vector<std::vector<std::vector<double> > > *candidate_scores,
     std::vector<std::vector<int> > *heads) {
+  std::vector<double> values(disabled->size(), 0);
   for (int i = 0; (*candidate_heads).size() > i; i += 1) {
     c_chu_liu_edmonds(&(*disabled)[i], &(*candidate_heads)[i],
-                      &(*candidate_scores)[i], &(*heads)[i] );
+                      &(*candidate_scores)[i], &(*heads)[i]);
+    if (number_of_root((*heads)[i]) > 1) {
+      std::cout << i<< " nice" << std::endl;
+    }
   }
 }
