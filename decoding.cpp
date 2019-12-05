@@ -33,7 +33,7 @@ void c_chu_liu_edmonds(vector<bool> *disabled,
   size_t length = disabled->size();
 
   // Pick the best incoming arc for each node.
-  heads->resize(length);
+  //  heads->resize(length);
   vector<double> best_scores(length);
   for (int m = 1; m < length; ++m) {
     if ((*disabled)[m]) continue;
@@ -209,12 +209,25 @@ void batch_c_chu_liu_edmonds(
     std::vector<std::vector<std::vector<int> > > *candidate_heads,
     std::vector<std::vector<std::vector<double> > > *candidate_scores,
     std::vector<std::vector<int> > *heads) {
-  std::vector<double> values(disabled->size(), 0);
-  for (int i = 0; (*candidate_heads).size() > i; i += 1) {
+  //  std::vector<double> values(disabled->size(), 0);
+  int candidate_heads_len = (*candidate_heads).size();
+  for (int i = 0; candidate_heads_len > i; i += 1) {
     c_chu_liu_edmonds(&(*disabled)[i], &(*candidate_heads)[i],
                       &(*candidate_scores)[i], &(*heads)[i]);
-    if (number_of_root((*heads)[i]) > 1) {
-      std::cout << i<< " nice" << std::endl;
+    bool flag = false;
+    int head_len = (*heads)[i].size();
+    for (int j = 0; head_len > j; j += 1) {
+      if ((*heads)[i][j] == 0) {
+        if (flag) {
+          (*heads)[i][j] = 1;
+        }
+        flag = true;
+      }
     }
   }
 }
+
+/*
+TODO
+1. remove multi root
+*/

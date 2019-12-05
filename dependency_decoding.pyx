@@ -32,8 +32,10 @@ def chu_liu_edmonds(double[:,:,:] score_arc, double [:,:] score_root, int [:] le
 
     cdef int dep_i, head_i
     cdef double edge_score
+    cdef int batch_size, sentence_len, max_len
 
     batch_size = len(lengths)
+    max_len = score_arc.shape[1] + 1
     candidate_heads.resize(batch_size)
     candidate_scores.resize(batch_size)
     heads.resize(batch_size)
@@ -45,7 +47,7 @@ def chu_liu_edmonds(double[:,:,:] score_arc, double [:,:] score_root, int [:] le
         sentence_len = l + 1
         candidate_scores[i].resize(sentence_len)
         candidate_heads[i].resize(sentence_len)
-        heads[i].resize(sentence_len, -1)
+        heads[i].resize(max_len, -1)
         disabled[i].resize(sentence_len, <cbool> False)
 
         for dep_i in range(l):
