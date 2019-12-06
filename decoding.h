@@ -24,10 +24,12 @@
 void c_chu_liu_edmonds(std::vector<bool> *disabled,
                        std::vector<std::vector<int> > *candidate_heads,
                        std::vector<std::vector<double> > *candidate_scores,
-                       std::vector<int> *heads);
+                       std::vector<int> *heads,
+                       double *value);
 
 void batch_c_chu_liu_edmonds(
     std::vector<std::vector<bool> > *disabled,
     std::vector<std::vector<std::vector<int> > > *candidate_heads,
     std::vector<std::vector<std::vector<double> > > *candidate_scores,
-    std::vector<std::vector<int> > *heads);
+    std::vector<std::vector<int> > *heads,
+    std::vector<double> *values);

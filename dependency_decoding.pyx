@@ -11,13 +11,14 @@ cdef extern from "decoding.h":
             vector[cbool] *disabled,
             vector[vector[int]] *candidate_heads,
             vector[vector[double]] *candidate_scores,
-            vector[int] *heads);
+            vector[int] *heads, double *value);
 
     cdef void batch_c_chu_liu_edmonds(
             vector[vector[cbool]] *disabled,
             vector[vector[vector[int]]] *candidate_heads,
             vector[vector[vector[double]]] *candidate_scores,
-            vector[vector[int]] *heads);
+            vector[vector[int]] *heads,
+            vector[double] *values);
 
 
 def chu_liu_edmonds(double[:,:,:] score_arc, double [:,:] score_root, int [:] lengths):
@@ -27,6 +28,7 @@ def chu_liu_edmonds(double[:,:,:] score_arc, double [:,:] score_root, int [:] le
     cdef vector[vector[vector[double]]] candidate_scores
     cdef vector[vector[int]] heads
     cdef vector[vector[cbool]] disabled
+    cdef vector[double] values
     # cdef vector[int] heads = vector[int](sentence_len, -1)
     # cdef vector[cbool] disabled = vector[cbool](sentence_len, <cbool> False)
 
@@ -40,6 +42,7 @@ def chu_liu_edmonds(double[:,:,:] score_arc, double [:,:] score_root, int [:] le
     candidate_scores.resize(batch_size)
     heads.resize(batch_size)
     disabled.resize(batch_size)
+    values.resize(batch_size)
 
     assert score_arc.shape[1] == score_arc.shape[2], "Score matrix must be square"
 
@@ -67,7 +70,8 @@ def chu_liu_edmonds(double[:,:,:] score_arc, double [:,:] score_root, int [:] le
         candidate_heads=&candidate_heads,
         candidate_scores=&candidate_scores,
         heads=&heads,
+        values=&values,
     )
 
     # Convert heads format
-    return heads
+    return heads, values

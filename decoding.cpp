@@ -28,7 +28,7 @@ using namespace std;
 void c_chu_liu_edmonds(vector<bool> *disabled,
                        vector<vector<int> > *candidate_heads,
                        vector<vector<double> > *candidate_scores,
-                       vector<int> *heads) {
+                       vector<int> *heads, double *value) {
   // Original number of nodes (including the root).
   size_t length = disabled->size();
 
@@ -85,6 +85,10 @@ void c_chu_liu_edmonds(vector<bool> *disabled,
 
   // If there are no cycles, then this is a well formed tree.
   if (cycle.empty()) {
+    *value = 0.0;
+    for (int m = 1; m < length; ++m) {
+      *value += best_scores[m];
+    }
     return;
   }
 
@@ -176,7 +180,7 @@ void c_chu_liu_edmonds(vector<bool> *disabled,
   int head_representative = (*heads)[representative];
 
   // Call itself recursively.
-  c_chu_liu_edmonds(disabled, candidate_heads, candidate_scores, heads);
+  c_chu_liu_edmonds(disabled, candidate_heads, candidate_scores, heads, value);
 
   // Uncontract the cycle.
   int h = (*heads)[representative];
@@ -208,12 +212,12 @@ void batch_c_chu_liu_edmonds(
     std::vector<std::vector<bool> > *disabled,
     std::vector<std::vector<std::vector<int> > > *candidate_heads,
     std::vector<std::vector<std::vector<double> > > *candidate_scores,
-    std::vector<std::vector<int> > *heads) {
+    std::vector<std::vector<int> > *heads, std::vector<double> *values) {
   //  std::vector<double> values(disabled->size(), 0);
   int candidate_heads_len = (*candidate_heads).size();
   for (int i = 0; candidate_heads_len > i; i += 1) {
     c_chu_liu_edmonds(&(*disabled)[i], &(*candidate_heads)[i],
-                      &(*candidate_scores)[i], &(*heads)[i]);
+                      &(*candidate_scores)[i], &(*heads)[i], &(*values)[i]);
     bool flag = false;
     int head_len = (*heads)[i].size();
     for (int j = 0; head_len > j; j += 1) {
